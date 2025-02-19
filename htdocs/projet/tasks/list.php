@@ -1340,7 +1340,8 @@ while ($i < $imaxinloop) {
 				$fullhour = convertSecondToTime($obj->planned_workload, $plannedworkloadoutputformat);
 				$workingdelay = convertSecondToTime($obj->planned_workload, 'all', 86400, 7); // TODO Replace 86400 and 7 to take account working hours per day and working day per weeks
 				if ($obj->planned_workload != '') {
-					print $fullhour;
+					// print $fullhour;
+          print $obj->planned_workload;
 					// TODO Add delay taking account of working hours per day and working day per week
 					//if ($workingdelay != $fullhour) print '<br>('.$workingdelay.')';
 				}
@@ -1375,9 +1376,13 @@ while ($i < $imaxinloop) {
 					print '<a href="'.DOL_URL_ROOT.'/projet/tasks/time.php?id='.$object->id.($showproject ? '' : '&withproject=1').'">';
 				}
 				if ($obj->duration_effective) {
-					print convertSecondToTime($obj->duration_effective, $timespentoutputformat);
+					# print convertSecondToTime($obj->duration_effective, $timespentoutputformat);
+          // print "OOOOOO"; 
+          print $obj->duration_effective;
 				} else {
-					print '--:--';
+          print $obj->duration_effective;
+          // print "OOOOOO"; 
+					print '--';
 				}
 				if ($showlineingray) {
 					print '</i>';

@@ -94,6 +94,34 @@ function print_eldy_menu($db, $atarget, $type_user, &$tabMenu, &$menu, $noout = 
 		'submenus' => array(),
 	);
 
+
+  ///// CATIE
+	// Pointages 
+	// $tmpentry = array(
+	// 	'enabled'=> true,
+	// 	'perms'=>($user->hasRight('user', 'user', 'lire') || $user->hasRight('holiday', 'read') || $user->hasRight('deplacement', 'lire') || $user->hasRight('expensereport', 'lire') || $user->hasRight('recruitment', 'recruitmentjobposition', 'read')),
+	// 	'module'=>'hrm|holiday|deplacement|expensereport|recruitment'
+	// );
+
+	$menu_arr[] = array(
+		'name' => 'RAILS',
+		'link' => '/rails',
+		'title' =>  "Gaasp",
+		'level' => 0,
+		'enabled' => true, # $showmode = isVisibleToUserType($type_user, $tmpentry, $listofmodulesforexternal),
+		'target' => $atarget,
+		'mainmenu' => "rails",
+		'leftmenu' => '',
+		'position' => 11,
+		'id' => $id,
+		'idsel' => 'rails',
+		'classname' =>  $classname = (!empty($_SESSION["mainmenu"]) && $_SESSION["mainmenu"] == "rails") ? 'class="tmenusel"' : 'class="tmenu"',
+		'prefix' => img_picto('', 'fa-fw fa-chart-bar', 'class="fa-fw fa-chart-bar pictofixedwidth"'),
+		'session' => ((!empty($_SESSION["mainmenu"]) && $_SESSION["mainmenu"] == "rails") ? 0 : 1),
+		'loadLangs' => array("rails", "holiday"),
+		'submenus' => array(),
+	);
+
 	// Members
 	$tmpentry = array(
 		'enabled' => isModEnabled('member'),

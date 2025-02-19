@@ -740,7 +740,6 @@ if ($conf->use_javascript_ajax && count($tasksarray) >= getDolGlobalInt('NBLINES
 }
 
 
-
 // By default, we can edit only tasks we are assigned to
 $restrictviewformytask = getDolGlobalInt('PROJECT_TIME_SHOW_TASK_NOT_ASSIGNED', 2);
 
@@ -866,6 +865,7 @@ if (count($tasksarray) > 0) {
 }
 print "</table>";
 print '</div>';
+
 
 print '<input type="hidden" id="numberOfLines" name="numberOfLines" value="'.count($tasksarray).'"/>'."\n";
 

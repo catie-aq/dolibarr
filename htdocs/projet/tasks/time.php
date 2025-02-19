@@ -205,9 +205,11 @@ if (GETPOST('button_removefilter_x', 'alpha') || GETPOST('button_removefilter.x'
 if ($action == 'addtimespent' && $user->hasRight('projet', 'time')) {
 	$error = 0;
 
-	$timespent_durationhour = GETPOSTINT('timespent_durationhour');
-	$timespent_durationmin = GETPOSTINT('timespent_durationmin');
-	if (empty($timespent_durationhour) && empty($timespent_durationmin)) {
+	#$timespent_durationhour = GETPOSTINT('timespent_durationhour');
+	#$timespent_durationmin = GETPOSTINT('timespent_durationmin');
+  $timespent_duration = GETPOST('timespent_duration', 'int');
+
+	if (empty($timespent_duration)) {
 		setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv("Duration")), null, 'errors');
 		$error++;
 	}
@@ -242,8 +244,10 @@ if ($action == 'addtimespent' && $user->hasRight('projet', 'time')) {
 				if (GETPOSTINT('progress') > 0) {
 					$object->progress = GETPOSTINT('progress'); // If progress is -1 (not defined), we do not change value
 				}
-				$object->timespent_duration = GETPOSTINT("timespent_durationhour") * 60 * 60; // We store duration in seconds
-				$object->timespent_duration += (GETPOSTINT('timespent_durationmin') ? GETPOSTINT('timespent_durationmin') : 0) * 60; // We store duration in seconds
+				// $object->timespent_duration = GETPOSTINT("timespent_durationhour") * 60 * 60; // We store duration in seconds
+				// $object->timespent_duration += (GETPOSTINT('timespent_durationmin') ? GETPOSTINT('timespent_durationmin') : 0) * 60; // We store duration in seconds
+        $object->timespent_duration = GETPOST("timespent_duration", 'int');
+
 				if (GETPOST("timehour") != '' && GETPOST("timehour") >= 0) {    // If hour was entered
 					$object->timespent_date = dol_mktime(GETPOSTINT("timehour"), GETPOSTINT("timemin"), 0, GETPOSTINT("timemonth"), GETPOSTINT("timeday"), GETPOSTINT("timeyear"));
 					$object->timespent_withhour = 1;
@@ -271,10 +275,15 @@ if ($action == 'addtimespent' && $user->hasRight('projet', 'time')) {
 if (($action == 'updateline' || $action == 'updatesplitline') && !$cancel && $user->hasRight('projet', 'lire')) {
 	$error = 0;
 
-	if (!GETPOST("new_durationhour") && !GETPOST("new_durationmin")) {
+	if (!GETPOST("new_duration")) {
 		setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv("Duration")), null, 'errors');
 		$error++;
 	}
+
+	// if (!GETPOST("new_durationhour") && !GETPOST("new_durationmin")) {
+	// 	setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv("Duration")), null, 'errors');
+	// 	$error++;
+	// }
 
 	if (!$error) {
 		if (GETPOSTINT('taskid') != $id) {        // GETPOST('taskid') is id of new task
@@ -291,9 +300,11 @@ if (($action == 'updateline' || $action == 'updatesplitline') && !$cancel && $us
 			$object->fetch($id_temp, $ref);
 
 			$object->timespent_note = GETPOST("timespent_note_line", "alphanohtml");
-			$object->timespent_old_duration = GETPOSTINT("old_duration");
-			$object->timespent_duration = GETPOSTINT("new_durationhour") * 60 * 60; // We store duration in seconds
-			$object->timespent_duration += (GETPOSTINT("new_durationmin") ? GETPOSTINT('new_durationmin') : 0) * 60; // We store duration in seconds
+			$object->timespent_old_duration = GETPOST("old_duration", "int");
+			$object->timespent_duration = GETPOST("new_duration", "int");
+			// $object->timespent_duration += (GETPOSTINT("new_durationmin") ? GETPOSTINT('new_durationmin') : 0) * 60; // We store duration in seconds
+      // $object->timespent_duration += (GETPOSTINT("new_duration") ? GETPOSTINT('new_durationmin') : 0) * 60; // We store duration in seconds
+      
 			if (GETPOST("timelinehour") != '' && GETPOST("timelinehour") >= 0) {    // If hour was entered
 				$object->timespent_date = dol_mktime(GETPOST("timelinehour"), GETPOST("timelinemin"), 0, GETPOST("timelinemonth"), GETPOST("timelineday"), GETPOST("timelineyear"));
 				$object->timespent_withhour = 1;
@@ -320,9 +331,9 @@ if (($action == 'updateline' || $action == 'updatesplitline') && !$cancel && $us
 
 			$object->timespent_id = GETPOSTINT("lineid");
 			$object->timespent_note = GETPOST("timespent_note_line", "alphanohtml");
-			$object->timespent_old_duration = GETPOSTINT("old_duration");
-			$object->timespent_duration = GETPOSTINT("new_durationhour") * 60 * 60; // We store duration in seconds
-			$object->timespent_duration += (GETPOSTINT("new_durationmin") ? GETPOSTINT('new_durationmin') : 0) * 60; // We store duration in seconds
+			$object->timespent_old_duration = GETPOST("old_duration", "int");
+      $object->timespent_duration = GETPOST("new_duration", "int");
+
 			if (GETPOST("timelinehour") != '' && GETPOST("timelinehour") >= 0) {    // If hour was entered
 				$object->timespent_date = dol_mktime(GETPOSTINT("timelinehour"), GETPOSTINT("timelinemin"), 0, GETPOSTINT("timelinemonth"), GETPOSTINT("timelineday"), GETPOSTINT("timelineyear"));
 				$object->timespent_withhour = 1;
@@ -595,7 +606,8 @@ if ($action == 'confirm_generateinvoice') {
 						} else {
 							$arrayoftasks[$object->timespent_id]['note'] = dol_concatdesc($arrayoftasks[$object->timespent_id]['note'], $langs->trans("Date") . ': ' . dol_print_date($object->timespent_date));
 						}
-						$arrayoftasks[$object->timespent_id]['note'] = dol_concatdesc($arrayoftasks[$object->timespent_id]['note'], $langs->trans("Duration") . ': ' . convertSecondToTime($object->timespent_duration, 'all', $conf->global->MAIN_DURATION_OF_WORKDAY));
+						$arrayoftasks[$object->timespent_id]['note'] = dol_concatdesc($arrayoftasks[$object->timespent_id]['note'], $langs->trans("Duration") . ': ' . $object->timespent_duration);
+						# $arrayoftasks[$object->timespent_id]['note'] = dol_concatdesc($arrayoftasks[$object->timespent_id]['note'], $langs->trans("Duration") . ': ' . convertSecondToTime($object->timespent_duration, 'all', $conf->global->MAIN_DURATION_OF_WORKDAY));
 					}
 					$arrayoftasks[$object->timespent_id]['user'] = $object->timespent_fk_user;
 					$arrayoftasks[$object->timespent_id]['fk_product'] = $object->timespent_fk_product;
@@ -685,7 +697,8 @@ if ($action == 'confirm_generateinvoice') {
 
 					foreach ($data as $fk_product => $timespent_data) {
 						$qtyhour = $timespent_data['timespent'] / 3600;
-						$qtyhourtext = convertSecondToTime($timespent_data['timespent'], 'all', $conf->global->MAIN_DURATION_OF_WORKDAY);
+						# $qtyhourtext = convertSecondToTime($timespent_data['timespent'], 'all', $conf->global->MAIN_DURATION_OF_WORKDAY);
+            $qtyhourtext = $timespent_data['timespent'];
 
 						// Add lines
 						$prodDurationHours = $prodDurationHoursBase;
@@ -844,8 +857,10 @@ if ($action == 'confirm_generateinter') {
 				$ftask = new Task($db);
 				$ftask->fetch($value['id']);
 				// Define qty per hour
-				$qtyhour = $value['timespent'] / 3600;
-				$qtyhourtext = convertSecondToTime($value['timespent'], 'all', $conf->global->MAIN_DURATION_OF_WORKDAY);
+				$qtyhour = $value['timespent'];
+				$qtyhourtext = $value['timespent'];
+        # $qtyhour = $value['timespent'] / 3600;
+        # $qtyhourtext = convertSecondToTime($value['timespent'], 'all', $conf->global->MAIN_DURATION_OF_WORKDAY);
 
 				// Add lines
 				$lineid = $tmpinter->addline($user, $tmpinter->id, $ftask->label . (!empty($value['note']) ? ' - ' . $value['note'] : ''), $value['date'], $value['timespent']);
@@ -1096,7 +1111,7 @@ if (($id > 0 || !empty($ref)) || $projectidforalltimes > 0 || $allprojectforuser
 		}
 
 		$paramsbutton = array('morecss' => 'reposition');
-		$linktocreatetime = dolGetButtonTitle($langs->trans('AddTimeSpent'), $linktocreatetimeHelpText, 'fa fa-plus-circle', $linktocreatetimeUrl, '', $linktocreatetimeBtnStatus, $paramsbutton);
+		// $linktocreatetime = dolGetButtonTitle($langs->trans('AddTimeSpent'), $linktocreatetimeHelpText, 'fa fa-plus-circle', $linktocreatetimeUrl, '', $linktocreatetimeBtnStatus, $paramsbutton);
 	}
 
 	$massactionbutton = '';
@@ -1193,7 +1208,8 @@ if (($id > 0 || !empty($ref)) || $projectidforalltimes > 0 || $allprojectforuser
 		// Planned workload
 		print '<tr><td>' . $langs->trans("PlannedWorkload") . '</td><td>';
 		if ($object->planned_workload) {
-			print convertSecondToTime($object->planned_workload, 'allhourmin');
+			print $object->planned_workload;
+      # print convertSecondToTime($object->planned_workload, 'allhourmin');
 		}
 		print '</td></tr>';
 
@@ -1837,6 +1853,8 @@ if (($id > 0 || !empty($ref)) || $projectidforalltimes > 0 || $allprojectforuser
 			print '</td>';
 
 			// Duration - Time spent
+
+      print 'HOLA';
 			print '<td class="nowraponall">';
 			$durationtouse = (GETPOST('timespent_duration') ? GETPOST('timespent_duration') : '');
 			if (GETPOSTISSET('timespent_durationhour') || GETPOSTISSET('timespent_durationmin')) {
@@ -2165,7 +2183,7 @@ if (($id > 0 || !empty($ref)) || $projectidforalltimes > 0 || $allprojectforuser
 				print '<td class="nowrap">';
 				if ($action == 'editline' && GETPOSTINT('lineid') == $task_time->rowid) {
 					if (empty($task_time->element_date_withhour)) {
-						print $form->selectDate(($date2 ? $date2 : $date1), 'timeline', 4, 3, 2, "timespent_date", 1, 0);
+						print $form->selectDate(($date2 ? $date2 : $date1), 'timeline', 0, 0, 0, "timespent_date", 1, 0);
 					} else {
 						print $form->selectDate(($date2 ? $date2 : $date1), 'timeline', 2, 1, 2, "timespent_date", 1, 0);
 					}
@@ -2341,9 +2359,15 @@ if (($id > 0 || !empty($ref)) || $projectidforalltimes > 0 || $allprojectforuser
 				print '<td class="right nowraponall">';
 				if ($action == 'editline' && GETPOSTINT('lineid') == $task_time->rowid) {
 					print '<input type="hidden" name="old_duration" value="'.$task_time->element_duration.'">';
-					print $form->select_duration('new_duration', $task_time->element_duration, 0, 'text');
+				
+          print '<input type="number" style="width: 5em;" required id="new_duration" name="new_duration" size="10" min="0" value="'.$task_time->element_duration.'" step="0.1">';
+          // simple input here.. 
+					// print $form->select_duration('new_duration', $task_time->element_duration, 0, 'text');
 				} else {
-					print convertSecondToTime($task_time->element_duration, 'allhourmin');
+          // Here we convert 0.1 to 1 hour in display ?
+          print $task_time->element_duration;
+				  # print convertSecondToTime($task_time->element_duration, 'dayratio');
+
 				}
 				print '</td>';
 				if (!$i) {
@@ -2523,8 +2547,11 @@ if (($id > 0 || !empty($ref)) || $projectidforalltimes > 0 || $allprojectforuser
 					print '<td class="nowrap">';
 					if ($action == 'splitline' && GETPOSTINT('lineid') == $task_time->rowid) {
 						if (empty($task_time->element_date_withhour)) {
+          
+              print("PWET3");
 							print $form->selectDate(($date2 ? $date2 : $date1), 'timeline', 3, 3, 2, "timespent_date", 1, 0);
 						} else {
+              print("PWET2");
 							print $form->selectDate(($date2 ? $date2 : $date1), 'timeline', 1, 1, 2, "timespent_date", 1, 0);
 						}
 					} else {
@@ -2622,7 +2649,8 @@ if (($id > 0 || !empty($ref)) || $projectidforalltimes > 0 || $allprojectforuser
 						print '<input type="hidden" name="old_duration" value="'.$task_time->element_duration.'">';
 						print $form->select_duration('new_duration', $task_time->element_duration, 0, 'text');
 					} else {
-						print convertSecondToTime($task_time->element_duration, 'allhourmin');
+						print $task_time->element_duration;
+            # print convertSecondToTime($task_time->element_duration, 'allhourmin');
 					}
 					print '</td>';
 				}
@@ -2687,8 +2715,10 @@ if (($id > 0 || !empty($ref)) || $projectidforalltimes > 0 || $allprojectforuser
 					print '<td class="nowrap">';
 					if ($action == 'splitline' && GETPOSTINT('lineid') == $task_time->rowid) {
 						if (empty($task_time->element_date_withhour)) {
+              print("PWET5");
 							print $form->selectDate(($date2 ? $date2 : $date1), 'timeline_2', 3, 3, 2, "timespent_date", 1, 0);
 						} else {
+              print("PWET4");
 							print $form->selectDate(($date2 ? $date2 : $date1), 'timeline_2', 1, 1, 2, "timespent_date", 1, 0);
 						}
 					} else {
@@ -2786,7 +2816,8 @@ if (($id > 0 || !empty($ref)) || $projectidforalltimes > 0 || $allprojectforuser
 						print '<input type="hidden" name="old_duration_2" value="0">';
 						print $form->select_duration('new_duration_2', 0, 0, 'text');
 					} else {
-						print convertSecondToTime($task_time->element_duration, 'allhourmin');
+						# print convertSecondToTime($task_time->element_duration, 'allhourmin');
+            print $task_time->element_duration;
 					}
 					print '</td>';
 				}
@@ -2855,7 +2886,8 @@ if (($id > 0 || !empty($ref)) || $projectidforalltimes > 0 || $allprojectforuser
 						print '<td class="left">'.$form->textwithpicto($langs->trans("Total"), $langs->trans("Totalforthispage")).'</td>';
 					}
 				} elseif (isset($totalarray['totaldurationfield']) && $totalarray['totaldurationfield'] == $i) {
-					print '<td class="right">' . convertSecondToTime($totalarray['totalduration'], 'allhourmin') . '</td>';
+					print '<td class="right">' . $totalarray['totalduration'] . '</td>';
+          # print '<td class="right">' . convertSecondToTime($totalarray['totalduration'], 'allhourmin') . '</td>';
 				} elseif (isset($totalarray['totalvaluefield']) && $totalarray['totalvaluefield'] == $i) {
 					print '<td class="right">' . price($totalarray['totalvalue']) . '</td>';
 					//} elseif ($totalarray['totalvaluebilledfield'] == $i) { print '<td class="center">'.price($totalarray['totalvaluebilled']).'</td>';

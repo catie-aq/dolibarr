@@ -228,6 +228,7 @@ function convertTime2Seconds($iHours = 0, $iMinutes = 0, $iSeconds = 0)
  *                                          - 'allhourminsec': total delay with format hours:min:sec like "60:30:10",
  *                                          - 'allhour': total delay hours without min/sec like "60:30",
  *                                          - 'fullhour': total delay hour decimal like "60.5" for 60:30,
+ *                                          - 'dayratio': Used for CATIE, fraction of day,
  *                                          - 'hour': only hours part "12",
  *                                          - 'min': only minutes part "30",
  *                                          - 'sec': only seconds part,
@@ -251,6 +252,10 @@ function convertSecondToTime($iSecond, $format = 'all', $lengthOfDay = 86400, $l
 	}
 	$nbHbyDay = $lengthOfDay / 3600;
 
+  if ($format == 'dayratio') {
+    return $iSecond;
+  }
+  
 	if ($format == 'all' || $format == 'allwithouthour' || $format == 'allhour' || $format == 'allhourmin' || $format == 'allhourminsec') {
 		if ((int) $iSecond === 0) {
 			return '0'; // This is to avoid having 0 return a 12:00 AM for en_US
@@ -297,9 +302,9 @@ function convertSecondToTime($iSecond, $format = 'all', $lengthOfDay = 86400, $l
 				$sTime .= dol_print_date($iSecond, 'hourduration', true);
 			}
 		} elseif ($format == 'allhourminsec') {
-			return sprintf("%02d", ($sWeek * $lengthOfWeek * $nbHbyDay + $sDay * $nbHbyDay + (int) floor($iSecond / 3600))).':'.sprintf("%02d", ((int) floor(($iSecond % 3600) / 60))).':'.sprintf("%02d", ((int) ($iSecond % 60)));
-		} elseif ($format == 'allhourmin') {
-			return sprintf("%02d", ($sWeek * $lengthOfWeek * $nbHbyDay + $sDay * $nbHbyDay + (int) floor($iSecond / 3600))).':'.sprintf("%02d", ((int) floor(($iSecond % 3600) / 60)));
+			return sprintf("%02d", ($sWeek * $lengthOfWeek * $nbHbyDay + $sDay * $nbHbyDay + (int) floor($iSecond/3600))).':'.sprintf("%02d", ((int) floor(($iSecond % 3600) / 60))).':'.sprintf("%02d", ((int) ($iSecond % 60)));
+    } elseif ($format == 'allhourmin') {
+			return sprintf("%02d", ($sWeek * $lengthOfWeek * $nbHbyDay + $sDay * $nbHbyDay + (int) floor($iSecond/3600))).':'.sprintf("%02d", ((int) floor(($iSecond % 3600)/60)));
 		} elseif ($format == 'allhour') {
 			return sprintf("%02d", ($sWeek * $lengthOfWeek * $nbHbyDay + $sDay * $nbHbyDay + (int) floor($iSecond / 3600)));
 		}

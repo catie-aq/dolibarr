@@ -778,8 +778,8 @@ function projectLinesa(&$inc, $parent, &$lines, &$level, $var, $showproject, &$t
 					print '</td>';
 				}
 
-				$plannedworkloadoutputformat = 'allhourmin';
-				$timespentoutputformat = 'allhourmin';
+				$plannedworkloadoutputformat = 'dayratio';
+				$timespentoutputformat = 'dayratio';
 				if (getDolGlobalString('PROJECT_PLANNED_WORKLOAD_FORMAT')) {
 					$plannedworkloadoutputformat = getDolGlobalString('PROJECT_PLANNED_WORKLOAD_FORMAT');
 				}
@@ -811,6 +811,11 @@ function projectLinesa(&$inc, $parent, &$lines, &$level, $var, $showproject, &$t
 					}
 					if ($lines[$i]->duration_effective) {
 						print convertSecondToTime($lines[$i]->duration_effective, $timespentoutputformat);
+            
+            # print $lines[$i]->timespent_duration;
+            #print $lines[$i]->timespent_duration;
+            # print $timespentoutputformat;
+            # print $lines[$i]->duration_effective;
 					} else {
 						print '--:--';
 					}
@@ -863,7 +868,7 @@ function projectLinesa(&$inc, $parent, &$lines, &$level, $var, $showproject, &$t
 					if (count($arrayfields) > 0 && !empty($arrayfields['t.tobill']['checked'])) {
 						print '<td class="right">';
 						if ($lines[$i]->usage_bill_time) {
-							print convertSecondToTime($lines[$i]->tobill, 'allhourmin');
+							print convertSecondToTime($lines[$i]->tobill, 'dayratio');
 							$total_projectlinesa_tobill += $lines[$i]->tobill;
 						} else {
 							print '<span class="opacitymedium">'.$langs->trans("NA").'</span>';
@@ -875,7 +880,7 @@ function projectLinesa(&$inc, $parent, &$lines, &$level, $var, $showproject, &$t
 					if (count($arrayfields) > 0 && !empty($arrayfields['t.billed']['checked'])) {
 						print '<td class="right">';
 						if ($lines[$i]->usage_bill_time) {
-							print convertSecondToTime($lines[$i]->billed, 'allhourmin');
+							print convertSecondToTime($lines[$i]->billed, 'dayratio');
 							$total_projectlinesa_billed += $lines[$i]->billed;
 						} else {
 							print '<span class="opacitymedium">'.$langs->trans("NA").'</span>';
@@ -1012,7 +1017,7 @@ function projectLinesa(&$inc, $parent, &$lines, &$level, $var, $showproject, &$t
 		}
 		if (count($arrayfields) > 0 && !empty($arrayfields['t.planned_workload']['checked'])) {
 			print '<td class="nowrap liste_total right">';
-			print convertSecondToTime($total_projectlinesa_planned, 'allhourmin');
+			print convertSecondToTime($total_projectlinesa_planned, 'dayratio');
 			print '</td>';
 		}
 		if (count($arrayfields) > 0 && !empty($arrayfields['t.duration_effective']['checked'])) {
@@ -1020,7 +1025,7 @@ function projectLinesa(&$inc, $parent, &$lines, &$level, $var, $showproject, &$t
 			if ($projectidfortotallink > 0) {
 				print '<a href="'.DOL_URL_ROOT.'/projet/tasks/time.php?projectid='.$projectidfortotallink.($showproject ? '' : '&withproject=1').'">';
 			}
-			print convertSecondToTime($total_projectlinesa_spent, 'allhourmin');
+			print convertSecondToTime($total_projectlinesa_spent, 'dayratio');
 			if ($projectidfortotallink > 0) {
 				print '</a>';
 			}
@@ -1085,12 +1090,12 @@ function projectLinesa(&$inc, $parent, &$lines, &$level, $var, $showproject, &$t
 		if ($showbilltime) {
 			if (count($arrayfields) > 0 && !empty($arrayfields['t.tobill']['checked'])) {
 				print '<td class="nowrap liste_total right">';
-				print convertSecondToTime($total_projectlinesa_tobill, 'allhourmin');
+				print convertSecondToTime($total_projectlinesa_tobill, 'dayratio');
 				print '</td>';
 			}
 			if (count($arrayfields) > 0 && !empty($arrayfields['t.billed']['checked'])) {
 				print '<td class="nowrap liste_total right">';
-				print convertSecondToTime($total_projectlinesa_billed, 'allhourmin');
+				print convertSecondToTime($total_projectlinesa_billed, 'dayratio');
 				print '</td>';
 			}
 		}
@@ -1322,10 +1327,10 @@ function projectLinesPerAction(&$inc, $parent, $fuser, $lines, &$level, &$projec
 
 			$alreadyspent = '';
 			if ($dayWorkLoad > 0) {
-				$alreadyspent = convertSecondToTime($lines[$i]->timespent_duration, 'allhourmin');
+				$alreadyspent = convertSecondToTime($lines[$i]->timespent_duration, 'dayratio');
 			}
 
-			print convertSecondToTime($lines[$i]->timespent_duration, 'allhourmin');
+			print convertSecondToTime($lines[$i]->timespent_duration, 'dayratio');
 
 			print '</td>';
 
@@ -1604,7 +1609,7 @@ function projectLinesPerDay(&$inc, $parent, $fuser, $lines, &$level, &$projectsr
 				if (!empty($arrayfields['t.planned_workload']['checked'])) {
 					print '<td class="leftborder plannedworkload right">';
 					if ($lines[$i]->planned_workload) {
-						print convertSecondToTime($lines[$i]->planned_workload, 'allhourmin');
+						print convertSecondToTime($lines[$i]->planned_workload, 'dayratio');
 					} else {
 						print '--:--';
 					}
@@ -1624,7 +1629,7 @@ function projectLinesPerDay(&$inc, $parent, $fuser, $lines, &$level, &$projectsr
 					// $lines[$i]->duration_effective is a denormalised field = summ of time spent by everybody for task. What we need is time consumed by user
 					if ($lines[$i]->duration_effective) {
 						print '<a href="'.DOL_URL_ROOT.'/projet/tasks/time.php?id='.$lines[$i]->id.'">';
-						print convertSecondToTime($lines[$i]->duration_effective, 'allhourmin');
+						print convertSecondToTime($lines[$i]->duration_effective, 'dayratio');
 						print '</a>';
 					} else {
 						print '--:--';
@@ -1635,7 +1640,7 @@ function projectLinesPerDay(&$inc, $parent, $fuser, $lines, &$level, &$projectsr
 					print '<td class="right">';
 					$tmptimespent = $taskstatic->getSummaryOfTimeSpent($fuser->id);
 					if ($tmptimespent['total_duration']) {
-						print convertSecondToTime($tmptimespent['total_duration'], 'allhourmin');
+						print convertSecondToTime($tmptimespent['total_duration'], 'dayratio');
 					} else {
 						print '--:--';
 					}
@@ -1696,7 +1701,7 @@ function projectLinesPerDay(&$inc, $parent, $fuser, $lines, &$level, &$projectsr
 
 				$alreadyspent = '';
 				if ($dayWorkLoad > 0) {
-					$alreadyspent = convertSecondToTime($dayWorkLoad, 'allhourmin');
+					$alreadyspent = convertSecondToTime($dayWorkLoad, 'dayratio');
 				}
 
 				$idw = 0;
@@ -2003,7 +2008,7 @@ function projectLinesPerWeek(&$inc, $firstdaytoshow, $fuser, $parent, $lines, &$
 				if (!empty($arrayfields['t.planned_workload']['checked'])) {
 					print '<td class="leftborder plannedworkload right">';
 					if ($lines[$i]->planned_workload) {
-						print convertSecondToTime($lines[$i]->planned_workload, 'allhourmin');
+						print convertSecondToTime($lines[$i]->planned_workload, 'dayratio');
 					} else {
 						print '--:--';
 					}
@@ -2023,7 +2028,7 @@ function projectLinesPerWeek(&$inc, $firstdaytoshow, $fuser, $parent, $lines, &$
 					// $lines[$i]->duration_effective is a denormalised field = summ of time spent by everybody for task. What we need is time consumed by user
 					if ($lines[$i]->duration_effective) {
 						print '<a href="'.DOL_URL_ROOT.'/projet/tasks/time.php?id='.((int) $lines[$i]->id).'">';
-						print convertSecondToTime($lines[$i]->duration_effective, 'allhourmin');
+						print convertSecondToTime($lines[$i]->duration_effective, 'dayratio');
 						print '</a>';
 					} else {
 						print '--:--';
@@ -2035,7 +2040,7 @@ function projectLinesPerWeek(&$inc, $firstdaytoshow, $fuser, $parent, $lines, &$
 					$tmptimespent = $taskstatic->getSummaryOfTimeSpent($fuser->id);
 					if ($tmptimespent['total_duration']) {
 						print '<a href="'.DOL_URL_ROOT.'/projet/tasks/time.php?id='.((int) $lines[$i]->id).'&search_user='.((int) $fuser->id).'">';
-						print convertSecondToTime($tmptimespent['total_duration'], 'allhourmin');
+						print convertSecondToTime($tmptimespent['total_duration'], 'dayratio');
 						print '</a>';
 					} else {
 						print '--:--';
@@ -2085,7 +2090,7 @@ function projectLinesPerWeek(&$inc, $firstdaytoshow, $fuser, $parent, $lines, &$
 
 					$alreadyspent = '';
 					if ($dayWorkLoad > 0) {
-						$alreadyspent = convertSecondToTime($dayWorkLoad, 'allhourmin');
+						$alreadyspent = convertSecondToTime($dayWorkLoad, 'dayratio');
 					}
 					$alttitle = $langs->trans("AddHereTimeSpentForDay", !empty($tmparray['day']) ? $tmparray['day'] : 0, $tmparray['mon']);
 
@@ -2314,7 +2319,7 @@ function projectLinesPerMonth(&$inc, $firstdaytoshow, $fuser, $parent, $lines, &
 				if (!empty($arrayfields['t.planned_workload']['checked'])) {
 					print '<td class="leftborder plannedworkload right">';
 					if ($lines[$i]->planned_workload) {
-						print convertSecondToTime($lines[$i]->planned_workload, 'allhourmin');
+          	print convertSecondToTime($lines[$i]->planned_workload, 'dayratio');
 					} else {
 						print '--:--';
 					}
@@ -2334,7 +2339,7 @@ function projectLinesPerMonth(&$inc, $firstdaytoshow, $fuser, $parent, $lines, &
 					// $lines[$i]->duration_effective is a denormalised field = summ of time spent by everybody for task. What we need is time consumed by user
 					if ($lines[$i]->duration_effective) {
 						print '<a href="'.DOL_URL_ROOT.'/projet/tasks/time.php?id='.$lines[$i]->id.'">';
-						print convertSecondToTime($lines[$i]->duration_effective, 'allhourmin');
+						print convertSecondToTime($lines[$i]->duration_effective, 'dayratio');
 						print '</a>';
 					} else {
 						print '--:--';
@@ -2345,7 +2350,7 @@ function projectLinesPerMonth(&$inc, $firstdaytoshow, $fuser, $parent, $lines, &
 					print '<td class="right">';
 					$tmptimespent = $taskstatic->getSummaryOfTimeSpent($fuser->id);
 					if ($tmptimespent['total_duration']) {
-						print convertSecondToTime($tmptimespent['total_duration'], 'allhourmin');
+					  print convertSecondToTime($tmptimespent['total_duration'], 'dayratio');
 					} else {
 						print '--:--';
 					}
@@ -2389,7 +2394,7 @@ function projectLinesPerMonth(&$inc, $firstdaytoshow, $fuser, $parent, $lines, &
 
 					$alreadyspent = '';
 					if ($weekWorkLoad > 0) {
-						$alreadyspent = convertSecondToTime($weekWorkLoad, 'allhourmin');
+						$alreadyspent = convertSecondToTime($weekWorkLoad, 'dayratio');
 					}
 					$alttitle = $langs->trans("AddHereTimeSpentForWeek", $weekNb);
 
@@ -2855,8 +2860,8 @@ function getTaskProgressView($task, $label = true, $progressNumber = true, $hide
 
 	$out = '';
 
-	$plannedworkloadoutputformat = 'allhourmin';
-	$timespentoutputformat = 'allhourmin';
+	$plannedworkloadoutputformat = 'dayratio';
+	$timespentoutputformat = 'dayratio';
 	if (getDolGlobalString('PROJECT_PLANNED_WORKLOAD_FORMAT')) {
 		$plannedworkloadoutputformat = getDolGlobalString('PROJECT_PLANNED_WORKLOAD_FORMAT');
 	}
