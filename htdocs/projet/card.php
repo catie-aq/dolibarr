@@ -604,10 +604,12 @@ if ($action == 'create' && $user->hasRight('projet', 'creer')) {
 
 	// Ref
 	$suggestedref = (GETPOST("ref") ? GETPOST("ref") : $defaultref);
-	print '<tr><td class="titlefieldcreate"><span class="fieldrequired">'.$langs->trans("Ref").'</span></td><td class><input class="maxwidth150onsmartphone" type="text" name="ref" value="'.dol_escape_htmltag($suggestedref).'">';
-	if ($suggestedref) {
-		print ' '.$form->textwithpicto('', $langs->trans("YouCanCompleteRef", $suggestedref));
-	}
+	print '<tr><td class="titlefieldcreate"><span class="fieldrequired">'.$langs->trans("Ref").'</span></td><td>';
+// 	if ($suggestedref) {
+// 		print ' '.$form->textwithpicto('', $langs->trans("YouCanCompleteRef", $suggestedref));
+// 	}
+  print 'Mis automatiquement : <b>OPP-MMYY-XXX client - mot clé</b>,  ex:  OPP-0125-001 CATIE - Gaaspard';
+	print '<input type="hidden" name="ref" value="'.(GETPOSTISSET("ref") ? GETPOST("ref", 'alpha') : $defaultref).'">';
 	print '</td></tr>';
 
 	// Label
@@ -794,7 +796,7 @@ if ($action == 'create' && $user->hasRight('projet', 'creer')) {
 		print $formproject->selectOpportunityStatus('opp_status', GETPOSTISSET('opp_status') ? GETPOST('opp_status') : $object->opp_status, 1, 0, 0, 0, '', 0, 1);
 
 		// Opportunity probability
-		print ' <input class="width50 right" type="text" id="opp_percent" name="opp_percent" title="'.dol_escape_htmltag($langs->trans("OpportunityProbability")).'" value="'.dol_escape_htmltag(GETPOSTISSET('opp_percent') ? GETPOST('opp_percent') : '').'"><span class="hideonsmartphone"> %</span>';
+		print ' <input class="width50 right" type="text" disabled id="opp_percent" name="opp_percent" title="'.dol_escape_htmltag($langs->trans("OpportunityProbability")).'" value="'.dol_escape_htmltag(GETPOSTISSET('opp_percent') ? GETPOST('opp_percent') : '').'"><span class="hideonsmartphone"> %</span>';
 		print '<input type="hidden" name="opp_percent_not_set" id="opp_percent_not_set" value="'.dol_escape_htmltag(GETPOSTISSET('opp_percent') ? '0' : '1').'">';
 		print '</td>';
 		print '</tr>';
@@ -1169,9 +1171,17 @@ if ($action == 'create' && $user->hasRight('projet', 'creer')) {
 			print $formproject->selectOpportunityStatus('opp_status', $object->opp_status, 1, 0, 0, 0, 'minwidth150 inline-block valignmiddle', 1, 1);
 
 			// Opportunity probability
-			print ' <input class="width50 right" type="text" id="opp_percent" name="opp_percent" title="'.dol_escape_htmltag($langs->trans("OpportunityProbability")).'" value="'.(GETPOSTISSET('opp_percent') ? GETPOST('opp_percent') : (strcmp($object->opp_percent, '') ? vatrate($object->opp_percent) : '')).'"> %';
+			print ' <input class="width50 right" type="text" disabled id="opp_percent" name="opp_percent" title="'.dol_escape_htmltag($langs->trans("OpportunityProbability")).'" value="'.(GETPOSTISSET('opp_percent') ? GETPOST('opp_percent') : (strcmp($object->opp_percent, '') ? vatrate($object->opp_percent) : '')).'"> %';
 			print '<span id="oldopppercent" class="opacitymedium"></span>';
+
+      print '<span style="margin-left: 1em;">';
+      print $form->textwithpicto("utilisation CATIE ", $langs->trans("OpportunityDescription"));
+
+      print '</span>';
+			# print $form->textwithtooltip(img_help(), "Truc", 1);
 			print '</div>';
+
+
 
 			print '<div id="divtocloseproject" class="inline-block valign clearboth paddingtop" style="display: none;">';
 			print '<input type="checkbox" id="inputcloseproject" name="closeproject" />';
@@ -1559,6 +1569,29 @@ if ($action == 'create' && $user->hasRight('projet', 'creer')) {
 				print dolGetButtonAction('', $langs->trans('ExportAccountingReportButtonLabel'), 'default', $url, '');
 			}
 			*/
+
+			// See in Gaaspard
+      print dolGetButtonAction('', "Voir dans Gaaspard", 'default', '/rails/projects/'.$object->id, '');
+
+      // Check if the project reference starts with 'OPP-'
+      if (strpos($object->ref, 'OPP-') === 0 && $object->statut != Project::STATUS_DRAFT) {
+        print dolGetButtonAction('', "Transformer en Projet", 'default', '/rails/projects/'.$object->id.'/convert_opp_to_pj', '');
+      }
+      // if (strpos($object->ref, 'PJ-') === 0) {
+      //   print dolGetButtonAction('', "PJ Transformer en Projet", 'default', '/rails/projects/'.$object->id.'/convert_opp_to_pj', '');
+		  // }
+   
+			// if (!getDolGlobalString('MAIN_DISABLEDRAFTSTATUS') && !getDolGlobalString('MAIN_DISABLEDRAFTSTATUS_PROJECT')) {
+			// 	if ($object->statut != Project::STATUS_DRAFT && $user->hasRight('projet', 'creer')) {
+			// 		if ($userWrite > 0) {
+			// 			print dolGetButtonAction('', $langs->trans('SetToDraft'), 'default', $_SERVER["PHP_SELF"].'?action=confirm_setdraft&amp;confirm=yes&amp;token='.newToken().'&amp;id='.$object->id, '');
+			// 		} else {
+			// 			print dolGetButtonAction($langs->trans('NotOwnerOfProject'), $langs->trans('SetToDraft'), 'default', $_SERVER['PHP_SELF']. '#', '', false);
+			// 		}
+			// 	}
+			// }
+
+
 
 			// Back to draft
 			if (!getDolGlobalString('MAIN_DISABLEDRAFTSTATUS') && !getDolGlobalString('MAIN_DISABLEDRAFTSTATUS_PROJECT')) {

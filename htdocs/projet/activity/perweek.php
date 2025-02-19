@@ -732,7 +732,6 @@ if ($conf->use_javascript_ajax) {
 }
 
 
-
 // By default, we can edit only tasks we are assigned to
 $restrictviewformytask = ((!isset($conf->global->PROJECT_TIME_SHOW_TASK_NOT_ASSIGNED)) ? 2 : $conf->global->PROJECT_TIME_SHOW_TASK_NOT_ASSIGNED);
 if (count($tasksarray) > 0) {
@@ -842,7 +841,7 @@ if (count($tasksarray) > 0) {
 			} elseif (!$isavailable[$tmpday]['afternoon']) {
 				$cssonholiday .= 'onholidayafternoon ';
 			}
-
+    
 			print '<td class="liste_total hide'.$idw.($cssonholiday ? ' '.$cssonholiday : '').($cssweekend ? ' '.$cssweekend : '').'" align="center"><div class="totalDay'.$idw.'">&nbsp;</div></td>';
 		}
 		print '<td class="liste_total center"><div class="totalDayAll">&nbsp;</div></td>';
@@ -853,6 +852,7 @@ if (count($tasksarray) > 0) {
 }
 print "</table>";
 print '</div>';
+
 
 print '<input type="hidden" id="numberOfLines" name="numberOfLines" value="'.count($tasksarray).'"/>'."\n";
 

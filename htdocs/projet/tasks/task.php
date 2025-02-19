@@ -45,7 +45,11 @@ $ref = GETPOST("ref", 'alpha', 1); // task ref
 $taskref = GETPOST("taskref", 'alpha'); // task ref
 $withproject = GETPOST('withproject', 'int');
 $project_ref = GETPOST('project_ref', 'alpha');
-$planned_workload = ((GETPOST('planned_workloadhour', 'int') != '' || GETPOST('planned_workloadmin', 'int') != '') ? (GETPOST('planned_workloadhour', 'int') > 0 ? GETPOST('planned_workloadhour', 'int') * 3600 : 0) + (GETPOST('planned_workloadmin', 'int') > 0 ? GETPOST('planned_workloadmin', 'int') * 60 : 0) : '');
+# $planned_workload = ((GETPOST('planned_workloadhour', 'int') != '' || GETPOST('planned_workloadmin', 'int') != '') ? (GETPOST('planned_workloadhour', 'int') > 0 ? GETPOST('planned_workloadhour', 'int') * 3600 : 0) + (GETPOST('planned_workloadmin', 'int') > 0 ? GETPOST('planned_workloadmin', 'int') * 60 : 0) : '');
+$planned_workload = GETPOST('planned_workload', 'int');
+
+# print 'planned_workload : '.$planned_workload;
+
 $mode = GETPOST('mode', 'alpha');
 
 // Initialize technical object to manage hooks of page. Note that conf->hooks_modules contains array of hook context
@@ -443,8 +447,15 @@ if ($id > 0 || !empty($ref)) {
 		print '<table class="border centpercent">';
 
 		// Ref
-		print '<tr><td class="titlefield fieldrequired">'.$langs->trans("Ref").'</td>';
-		print '<td><input class="minwidth100" name="taskref" value="'.$object->ref.'"></td></tr>';
+    //     print '<tr><td class="titlefield fieldrequired">'.$langs->trans("Ref").'</td>';
+    //     print '<td><input class="minwidth100" name="taskref" value="'.$object->ref.'">';
+    print '<td><input type="hidden" name="taskref" value="'.$object->ref.'">';
+
+    // New tooltip !
+    $s = $form->textwithpicto("Code", $langs->trans("TaskCatie"), 1);
+    print $s;
+
+    print '</td></tr>';
 
 		// Label
 		print '<tr><td class="fieldrequired">'.$langs->trans("Label").'</td>';
@@ -473,18 +484,20 @@ if ($id > 0 || !empty($ref)) {
 
 		// Date start
 		print '<tr><td>'.$langs->trans("DateStart").'</td><td>';
-		print $form->selectDate($object->date_start, 'dateo', 1, 1, 0, '', 1, 0);
+		print $form->selectDate($object->date_start, 'dateo', 0, 0, 0, '', 1, 0);
 		print '</td></tr>';
 
 		// Date end
 		print '<tr><td>'.$langs->trans("Deadline").'</td><td>';
-		print $form->selectDate($object->date_end ? $object->date_end : -1, 'datee', 1, 1, 0, '', 1, 0);
+		print $form->selectDate($object->date_end ? $object->date_end : -1, 'datee', 0, 0, 0, '', 1, 0);
 		print '</td></tr>';
 
 		// Planned workload
 		print '<tr><td>'.$langs->trans("PlannedWorkload").'</td><td>';
-		print $form->select_duration('planned_workload', $object->planned_workload, 0, 'text');
-		print '</td></tr>';
+		// print $form->select_duration('planned_workload', $object->planned_workload, 0, 'text');
+    print '<input  type="number" step="0.1" name="planned_workload" class="minwidth200" value="'.$object->planned_workload.'">';
+    print '</td></tr>';
+    
 
 		// Progress declared
 		print '<tr><td>'.$langs->trans("ProgressDeclared").'</td><td>';
@@ -578,9 +591,9 @@ if ($id > 0 || !empty($ref)) {
 
 		// Date start - Date end task
 		print '<tr><td class="titlefield">'.$langs->trans("DateStart").' - '.$langs->trans("Deadline").'</td><td colspan="3">';
-		$start = dol_print_date($object->date_start, 'dayhour');
+		$start = dol_print_date($object->date_start, 'day');
 		print($start ? $start : '?');
-		$end = dol_print_date($object->date_end, 'dayhour');
+		$end = dol_print_date($object->date_end, 'day');
 		print ' - ';
 		print($end ? $end : '?');
 		if ($object->hasDelay()) {
@@ -591,7 +604,7 @@ if ($id > 0 || !empty($ref)) {
 		// Planned workload
 		print '<tr><td>'.$langs->trans("PlannedWorkload").'</td><td colspan="3">';
 		if ($object->planned_workload != '') {
-			print convertSecondToTime($object->planned_workload, 'allhourmin');
+			print convertSecondToTime($object->planned_workload, 'dayratio');
 		}
 		print '</td></tr>';
 
@@ -659,12 +672,18 @@ if ($id > 0 || !empty($ref)) {
 
 		print '<div class="tabsAction">';
 
+    // print '<h1>Actions</h1>';
 		$parameters = array();
 		$reshook = $hookmanager->executeHooks('addMoreActionsButtons', $parameters, $object, $action); // Note that $action and $object may have been
 		// modified by hook
 		if (empty($reshook)) {
 			// Modify
 			if ($user->hasRight('projet', 'creer')) {
+
+        #if (substr($object->ref, 0, 6) !== substr($projectstatic->ref, 0, 6)) {
+          print '<a class="butAction" href="'.DOL_URL_ROOT.'/rails/tasks/'.$object->id.'/rename">'.$langs->trans('Nommage auto').'</a>';
+        #}
+        
 				print '<a class="butAction" href="'.$_SERVER['PHP_SELF'].'?id='.$object->id.'&action=edit&token='.newToken().'&withproject='.((int) $withproject).'">'.$langs->trans('Modify').'</a>';
 				print '<a class="butAction" href="'.$_SERVER['PHP_SELF'].'?id='.$object->id.'&action=clone&token='.newToken().'&withproject='.((int) $withproject).'">'.$langs->trans('Clone').'</a>';
 			} else {
