@@ -772,7 +772,7 @@ function Search2(keyCodeForEnter, moreorless) {
 						console.log("There is only 1 answer with barcode matching the search, so we change the thirdparty "+data[0]['rowid']);
 						ChangeThirdparty(data[0]['rowid']);
 					}
-					else if ($('#search').val() == data[0]['barcode'] && 'product' == data[0]['object']) {
+					else if ('product' == data[0]['object'] && $('#search').val() == data[0]['barcode']) {
 						console.log("There is only 1 answer and we found search on a barcode, so we add the product in basket, qty="+data[0]['qty']);
 						ClickProduct(0, data[0]['qty']);
 					}
@@ -1444,7 +1444,7 @@ if (getDolGlobalString('TAKEPOS_WEIGHING_SCALE')) {
 			}
 		}
 
-		if (getDolGlobalString('TAKEPOS_HIDE_HEAD_BAR')) {
+		if (getDolGlobalString('TAKEPOS_HIDE_HEAD_BAR') && !getDolGlobalString('TAKEPOS_HIDE_SEARCH')) {
 			print '<!-- Show the search input text -->'."\n";
 			print '<div class="margintoponly">';
 			print '<input type="text" id="search" class="input-nobottom" name="search" onkeyup="Search2(\''.dol_escape_js($keyCodeForEnter).'\', null);" style="width: 80%; width:calc(100% - 51px); font-size: 150%;" placeholder="'.dol_escape_htmltag($langs->trans("Search")).'" autofocus> ';
