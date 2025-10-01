@@ -59,6 +59,7 @@ $toselect = GETPOST('toselect', 'array');
 
 $id = GETPOSTINT('id');
 $ref = GETPOST('ref', 'alpha');
+
 $taskref = GETPOST('taskref', 'alpha');
 
 // Load variable for pagination
@@ -149,13 +150,16 @@ $progress = GETPOSTINT('progress');
 $budget_amount = GETPOSTFLOAT('budget_amount');
 $label = GETPOST('label', 'alpha');
 $description = GETPOST('description', 'restricthtml');
-$planned_workloadhour = (GETPOSTISSET('planned_workloadhour') ? GETPOSTINT('planned_workloadhour') : '');
-$planned_workloadmin = (GETPOSTISSET('planned_workloadmin') ? GETPOSTINT('planned_workloadmin') : '');
-if (GETPOSTISSET('planned_workloadhour') || GETPOSTISSET('planned_workloadmin')) {
-	$planned_workload = (int) $planned_workloadhour * 3600 + (int) $planned_workloadmin * 60;
-} else {
-	$planned_workload = '';
-}
+#$planned_workloadhour = (GETPOSTISSET('planned_workloadhour') ? GETPOSTINT('planned_workloadhour') : '');
+#$planned_workloadmin = (GETPOSTISSET('planned_workloadmin') ? GETPOSTINT('planned_workloadmin') : '');
+#if (GETPOSTISSET('planned_workloadhour') || GETPOSTISSET('planned_workloadmin')) {
+#	$planned_workload = (int) $planned_workloadhour * 3600 + (int) $planned_workloadmin * 60;
+#} else {
+#	$planned_workload = '';
+#}
+
+$planned_workload = GETPOST('planned_workload', 'int');
+
 
 // Definition of fields for list
 $arrayfields = array(
@@ -755,12 +759,14 @@ if ($action == 'create' && $user->hasRight('projet', 'creer') && (empty($object-
 	}
 
 	// Ref
+  // TODO: Catie Ref here ?
 	print '<tr><td class="titlefieldcreate"><span class="fieldrequired">'.$langs->trans("Ref").'</span></td><td>';
-	if (empty($duplicate_code_error)) {
-		print(GETPOSTISSET("ref") ? GETPOST("ref", 'alpha') : $defaultref);
-	} else {
-		print $defaultref;
-	}
+	// if (empty($duplicate_code_error)) {
+	// 	print(GETPOSTISSET("ref") ? GETPOST("ref", 'alpha') : $defaultref);
+	// } else {
+	// 	print $defaultref;
+	// }
+  print 'Mis automatiquement : <b>RefProjet-TYPE libellé</b>,  ex:  PJ-555-WP Lot 1';
 	print '<input type="hidden" name="taskref" value="'.(GETPOSTISSET("ref") ? GETPOST("ref", 'alpha') : $defaultref).'">';
 	print '</td></tr>';
 
@@ -795,10 +801,26 @@ if ($action == 'create' && $user->hasRight('projet', 'creer') && (empty($object-
 	}
 	print '</td></tr>';
 
+  // if the project % is below 100, print a warning to open the project 
+  
+  // // Debug information for the project
+  // print '<tr><td colspan="2">';
+  // print '<div class="debug">';
+  // print 'Project Progress: ' . $object->opp_percent . '%<br>';
+  // print 'Project Status: ' . ($object->statut == 1 ? 'Open' : 'Closed') . '<br>';
+  // print 'Project Reference starts with PJ: ' . (strpos($object->ref, 'PJ') === 0 ? 'Yes' : 'No') . '<br>';
+  // print '</div>';
+  // print '</td></tr>';
+
+  if ($object->opp_percent < 100) {
+    print '<tr><td colspan="2" class="warning"> Attention, le projet n\'est pas gagné, 
+    il est conseillé de le transformer en projet avant de créer une tâche de travail. </td></tr>';
+  }
+
 	// Date start task
 	print '<tr><td>'.$langs->trans("DateStart").'</td><td>';
 	print img_picto('', 'action', 'class="pictofixedwidth"');
-	print $form->selectDate((!empty($date_start) ? $date_start : ''), 'date_start', 1, 1, 0, '', 1, 1);
+	print $form->selectDate((!empty($date_start) ? $date_start : ''), 'date_start', 0, 0, 0, '', 1, 1);
 	print '</td></tr>';
 
 	// Date end task
@@ -810,8 +832,9 @@ if ($action == 'create' && $user->hasRight('projet', 'creer') && (empty($object-
 	// Planned workload
 	print '<tr><td>'.$langs->trans("PlannedWorkload").'</td><td>';
 	print img_picto('', 'clock', 'class="pictofixedwidth"');
-	print $form->select_duration('planned_workload', $planned_workload, 0, 'text');
+  print '<input  type="number" step="0.1" name="planned_workload" autofocus class="minwidth200" value="'.$planned_workload.'">';
 	print '</td></tr>';
+  
 
 	// Progress
 	print '<tr><td>'.$langs->trans("ProgressDeclared").'</td><td colspan="3">';
