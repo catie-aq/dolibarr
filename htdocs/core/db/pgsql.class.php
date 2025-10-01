@@ -169,13 +169,12 @@ class DoliDBPgsql extends DoliDB
 			return $line;
 		}
 		if ($line != "") {
-			// group_concat support (PgSQL >= 9.0)
-			// Replace group_concat(x) or group_concat(x SEPARATOR ',') with string_agg(x, ',')
-			$line = preg_replace('/GROUP_CONCAT/i', 'STRING_AGG', $line);
-			$line = preg_replace('/ SEPARATOR/i', ',', $line);
-			$line = preg_replace('/STRING_AGG\(([^,\)]+)\)/i', 'STRING_AGG(\\1, \',\')', $line);
-			$line = preg_replace('/STRING_AGG\(([^,]+),([^\)]+)\)/i', 'STRING_AGG(\\1::TEXT,\\2::TEXT)', $line);
-			//print $line."\n";
+      // group_concat support (PgSQL >= 9.0)
+      // Replace GROUP_CONCAT(x) or GROUP_CONCAT(x SEPARATOR ',') with STRING_AGG(x::text, ',')
+      $line = preg_replace('/GROUP_CONCAT/i', 'STRING_AGG', $line);
+      $line = preg_replace('/ SEPARATOR/i', ',', $line);
+      $line = preg_replace('/STRING_AGG\(([^,\)]+)\)/i', 'STRING_AGG(\\1::text, \',\')', $line);
+      //print $line."\n";
 
 			if ($type == 'auto') {
 				if (preg_match('/ALTER TABLE/i', $line)) {

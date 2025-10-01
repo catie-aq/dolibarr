@@ -257,7 +257,7 @@ class MailingTargets // This can't be abstract as it is used for some method
 
 		if (empty($this->evenunsubscribe)) {
 			$sql = "UPDATE ".MAIN_DB_PREFIX."mailing_cibles as mc";
-			$sql .= " SET mc.statut = 3";
+			$sql .= " SET statut = 3";
 			$sql .= " WHERE mc.fk_mailing = ".((int) $mailing_id);
 			$sql .= " AND EXISTS (SELECT rowid FROM ".MAIN_DB_PREFIX."mailing_unsubscribe as mu WHERE mu.email = mc.email and mu.entity = ".((int) $conf->entity).")";
 
